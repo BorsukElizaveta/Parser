@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Parser</title>
+</head>
+<body>
+<p>element:button;text:banana ili net;count:8;</p>
+
+<script>
+    const element = document.querySelector('p');
+    const container = element.parentNode;
+    const source = element.textContent;
+    const keyRegExp = /element|text|count/;
+    const keys = ['element', 'text', 'count'];
+
+    /**
+     * @property {string} count
+     * @property {string} element
+     * @property {string} text
+     */
+    const parsedSource = source
+        .split(/(\w+:[\w\s]+)/g)
+        .filter((item) => item.includes(':'))
+        .map((item) => {
+            const [key, value] = item.split(':');
+            const matchedKey = key.match(keyRegExp);
+
+            if (matchedKey != null) {
+                return [matchedKey[0], value];
+            }
+
+            return undefined;
+        })
+        .filter(Boolean)
+        .reduce((items, [key, value]) => ({ ...items, [key]: value }), {});
+
+    console.log(parsedSource);
+
+    function compare(arr1, arr2) {
+        return arr1.length === arr2.length && arr1.every((value, index) => value === arr2[index]);
+    }
+
+    if (!compare(keys, Object.keys(parsedSource))) {
+        alert(`Переданы не все необходимые параметры ${keys.toString()}`);
+    }
+
+    element.remove();
+
+    for (let i = 0; i < parsedSource.count; i++) {
+        const item = document.createElement(parsedSource.element);
+        const text = document.createTextNode(parsedSource.text);
+
+        item.appendChild(text);
+        container.appendChild(item);
+    }
+</script>
+</body>
+</html>
